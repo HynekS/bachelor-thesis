@@ -4,7 +4,7 @@ import { drizzle } from 'drizzle-orm/better-sqlite3';
 
 const db =  drizzle({ connection: { source: process.env.DATABASE_URL }});
 
-export { db };
+export default db;
 
 //async function main() {
 //  const user: typeof usersTable.$inferInsert = {
