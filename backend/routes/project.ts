@@ -19,7 +19,7 @@ module.exports = async (fastify: FastifyInstance) => {
 			.select()
 			.from(project)
 			.where(eq(project.id, parsedParams.id));
-		return result;
+		reply.send(result);
 	});
 
 	fastify.post("/project", async (request, reply) => {
@@ -34,11 +34,12 @@ module.exports = async (fastify: FastifyInstance) => {
 	fastify.patch("/project/:id", async (request, reply) => {
 		const parsedParams = ProjectIdParamsSchema.parse(request.params);
 		const parsedRequestBody = projectUpdateSchema.parse(request.body);
-		await db
+		const [result] = await db
 			.update(project)
 			.set(parsedRequestBody)
 			.where(eq(project.id, parsedParams.id))
 			.returning();
+		reply.send(result);
 	});
 
 	fastify.delete("/project/:id", async (request, reply) => {
