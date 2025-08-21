@@ -1,4 +1,4 @@
-# my-electron-app
+# archeo-matrix-builder
 
 An Electron application with React and TypeScript
 
