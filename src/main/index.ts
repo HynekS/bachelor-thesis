@@ -58,11 +58,11 @@ app.whenReady().then(() => {
 
   fastify
     .listen({
-      port: 4321,
-      host: 'localhost'
+      port: import.meta.env.VITE_API_PORT,
+      host: import.meta.env.VITE_API_HOST
     })
     .then(() => {
-      console.log('Server is running on http://localhost:4321/api/v1')
+      console.log(`Server is running on ${import.meta.env.VITE_API_URL}`)
     })
     .catch((err) => {
       console.error('Error starting server:', err)

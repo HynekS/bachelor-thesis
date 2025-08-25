@@ -6,7 +6,7 @@ function App(): React.JSX.Element {
   const ipcHandle = (): void => window.electron.ipcRenderer.send('ping')
 
   useEffect(() => {
-    fetch('http://localhost:4321/project/1').then((res) =>
+    fetch(`${import.meta.env.VITE_API_URL}/project/1`).then((res) =>
       res.json().then((data) => console.log(data))
     )
   }, [])

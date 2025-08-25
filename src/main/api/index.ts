@@ -10,7 +10,7 @@ const fastify: FastifyInstance = Fastify({
 })
 
 fastify.register(cors, {
-  origin: 'http://localhost:5173'
+  origin: import.meta.env.VITE_DEV_SERVER_URL
 })
 fastify.register(projectRoutes)
 fastify.register(nodeRoutes)
