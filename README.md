@@ -8,27 +8,43 @@ An Electron application with React and TypeScript
 
 ## Project Setup
 
+Sadly, this project has some issues with pnpm - the drizzle sqlite migration script somehow broke the dependencies and I wasn't able to fix that with pnpm.
+
+I recommend using yarn for this project - it can fix the broken dependencies simply by running `pnpm rebuild`.
+
 ### Install
 
 ```bash
-$ pnpm install
+yarn install
 ```
 
 ### Development
 
+Dev mode
+
 ```bash
-$ pnpm dev
+yarn dev
+```
+
+Preview mode (whatever this is)
+
+```bash
+yarn start
 ```
 
 ### Build
 
 ```bash
 # For windows
-$ pnpm build:win
+$ yarn build:win
 
 # For macOS
-$ pnpm build:mac
+$ yarn build:mac
 
 # For Linux
-$ pnpm build:linux
+$ yarn build:linux
 ```
+
+### Api
+
+There is a Fastify server running in the Electron app. It is accessible by default on `http://localhost:4321/api/v1/<domain>`. The exact path can be configured via the .env file.

@@ -5,6 +5,8 @@ import projectRoutes from './routes/project'
 import nodeRoutes from './routes/node'
 import edgeRoutes from './routes/edge'
 
+const prefix = import.meta.env.VITE_API_PREFIX
+
 const fastify: FastifyInstance = Fastify({
   logger: true
 })
@@ -12,8 +14,8 @@ const fastify: FastifyInstance = Fastify({
 fastify.register(cors, {
   origin: import.meta.env.VITE_DEV_SERVER_URL
 })
-fastify.register(projectRoutes)
-fastify.register(nodeRoutes)
-fastify.register(edgeRoutes)
+fastify.register(projectRoutes, { prefix })
+fastify.register(nodeRoutes, { prefix })
+fastify.register(edgeRoutes, { prefix })
 
 export { fastify }
