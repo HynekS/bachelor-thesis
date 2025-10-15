@@ -94,67 +94,38 @@ export class Graph {
     return topologicalOrder
   }
 
-  /*
-  getComponents(): Graph[] {
-    const clonedTopologicalySortedGraph = new Graph(this.nodes.slice(), this.edges.slice())
-
-    const incomingEdgesCountMap = this.getCountsOfIncomingEdges()
-
-    const nodesWithoutIncomingEdges: GraphNode[] = this.nodes.filter(
-      (node) => incomingEdgesCountMap.get(node) === 0
-    )
-
-    const visited = new Set<GraphNode>()
-
-    const components: GraphNode[][] = [[]]
-    const currentComponentIndex = 0
-
-    while (nodesWithoutIncomingEdges.length > 0) {
-      const currentNode = nodesWithoutIncomingEdges.shift()
-
-      if (!currentNode) {
-        break
-      }
-
-      // visited.add(currentNode)
-      components[currentComponentIndex].push(currentNode)
-
-      const directlyAccessibleNodes = this.getAdjacentNodes(currentNode)
-    }
-  }*/
-
   getComponents(): GraphNode[][] {
-    const clonedGraph = new Graph(this.nodes.slice(), this.edges.slice())
-
+    const nodesById = new Map<string, GraphNode>(this.nodes.map((n) => [n.id, n]))
     const visited = new Set<string>()
     const components: GraphNode[][] = []
 
-    function getComponent(node: GraphNode): GraphNode[] {
-      const component: GraphNode[] = []
-      const stack: GraphNode[] = [node]
-
-      while (stack.length > 0) {
-        const current = stack.pop()!
-        if (!visited.has(current.id)) {
-          visited.add(current.id)
-          component.push(current)
-          const neighbors = clonedGraph.getAdjacentNodes(current)
-          for (const neighbor of neighbors) {
-            if (!visited.has(neighbor.id)) {
-              stack.push(neighbor)
-            }
-          }
-        }
-      }
-      return component
+    const adjacency = new Map<string, Set<string>>()
+    for (const node of this.nodes) {
+      adjacency.set(node.id, new Set())
+    }
+    for (const edge of this.edges) {
+      adjacency.get(edge.from)!.add(edge.to)
+      adjacency.get(edge.to)!.add(edge.from)
     }
 
-    for (const node of clonedGraph.nodes) {
+    const dfs = (nodeId: string, component: GraphNode[]): void => {
+      visited.add(nodeId)
+      component.push(nodesById.get(nodeId)!)
+      for (const neighbor of adjacency.get(nodeId)!) {
+        if (!visited.has(neighbor)) {
+          dfs(neighbor, component)
+        }
+      }
+    }
+
+    for (const node of this.nodes) {
       if (!visited.has(node.id)) {
-        const component = getComponent(node)
+        const component: GraphNode[] = []
+        dfs(node.id, component)
         components.push(component)
       }
     }
+
     return components
   }
 }
