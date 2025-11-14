@@ -4,7 +4,7 @@ function App(): React.JSX.Element {
   const testQuery = useQuery({
     queryKey: ['test'],
     queryFn: () =>
-      fetch(`${import.meta.env.VITE_API_URL_PREFIXED}/project/1`).then((res) =>
+      fetch(`${import.meta.env.VITE_API_URL_PREFIXED}/projects/1`).then((res) =>
         res.json().then((data) => data)
       )
   })

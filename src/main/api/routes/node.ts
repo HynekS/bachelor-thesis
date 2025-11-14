@@ -9,19 +9,19 @@ const NodeIdParamsSchema = z.object({
 })
 
 const nodeRoutes = (fastify: FastifyInstance): void => {
-  fastify.get('/node', async (request, reply) => {
+  fastify.get('/nodes', async (request, reply) => {
     const parsedParams = NodeIdParamsSchema.parse(request.params)
     const result = await db.select().from(node).where(eq(node.id, parsedParams.id))
     reply.send(result)
   })
 
-  fastify.post('/node', async (request, reply) => {
+  fastify.post('/nodes', async (request, reply) => {
     const parsedRequestBody = nodeInsertSchema.parse(request.body)
     const [result] = await db.insert(node).values(parsedRequestBody).returning()
     reply.send(result)
   })
 
-  fastify.patch('/node', async (request, reply) => {
+  fastify.patch('/nodes', async (request, reply) => {
     const parsedParams = NodeIdParamsSchema.parse(request.params)
     const parsedRequestBody = nodeUpdateSchema.parse(request.body)
     const [result] = await db
@@ -32,7 +32,7 @@ const nodeRoutes = (fastify: FastifyInstance): void => {
     reply.send(result)
   })
 
-  fastify.delete('/node/:id', async (request, reply) => {
+  fastify.delete('/nodes/:id', async (request, reply) => {
     const parsedParams = NodeIdParamsSchema.parse(request.params)
     await db.delete(node).where(eq(node.id, parsedParams.id))
     reply.code(204)

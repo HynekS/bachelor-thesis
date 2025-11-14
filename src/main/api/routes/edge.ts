@@ -10,19 +10,19 @@ const EdgeIdParamsSchema = z.object({
 })
 
 const edgeRoutes = (fastify: FastifyInstance): void => {
-  fastify.get('/edge', async (request, reply) => {
+  fastify.get('/edges', async (request, reply) => {
     const parsedParams = EdgeIdParamsSchema.parse(request.params)
     const result = await db.select().from(edge).where(eq(edge.id, parsedParams.id))
     reply.send(result)
   })
 
-  fastify.post('/edge', async (request, reply) => {
+  fastify.post('/edges', async (request, reply) => {
     const parsedRequestBody = edgeInsertSchema.parse(request.body)
     const [result] = await db.insert(edge).values(parsedRequestBody).returning()
     reply.send(result)
   })
 
-  fastify.patch('/edge', async (request, reply) => {
+  fastify.patch('/edges', async (request, reply) => {
     const parsedParams = EdgeIdParamsSchema.parse(request.params)
     const parsedRequestBody = edgeUpdateSchema.parse(request.body)
     const [result] = await db
@@ -33,7 +33,7 @@ const edgeRoutes = (fastify: FastifyInstance): void => {
     reply.send(result)
   })
 
-  fastify.delete('/edge/:id', async (request, reply) => {
+  fastify.delete('/edges/:id', async (request, reply) => {
     const parsedParams = EdgeIdParamsSchema.parse(request.params)
     await db.delete(edge).where(eq(edge.id, parsedParams.id))
     reply.code(204)

@@ -16,3 +16,5 @@ export const project = sqliteTable('project', {
 
 export const projectInsertSchema = createInsertSchema(project)
 export const projectUpdateSchema = createUpdateSchema(project)
+
+export type Project = typeof project.$inferSelect

@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./react-aria-components.css";
 
 :root {
   --ev-c-white: #ffffff;

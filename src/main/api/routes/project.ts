@@ -9,19 +9,24 @@ const ProjectIdParamsSchema = z.object({
 })
 
 const projectRoutes = (fastify: FastifyInstance): void => {
-  fastify.get('/project/:id', async (request, reply) => {
+  fastify.get('/projects', async (_, reply) => {
+    const result = await db.select().from(project)
+    reply.send(result)
+  })
+
+  fastify.get('/projects/:id', async (request, reply) => {
     const parsedParams = ProjectIdParamsSchema.parse(request.params)
     const result = await db.select().from(project).where(eq(project.id, parsedParams.id))
     reply.send(result)
   })
 
-  fastify.post('/project', async (request, reply) => {
+  fastify.post('/projects', async (request, reply) => {
     const parsedRequestBody = projectInsertSchema.parse(request.body)
     const [result] = await db.insert(project).values(parsedRequestBody).returning()
     reply.send(result)
   })
 
-  fastify.patch('/project/:id', async (request, reply) => {
+  fastify.patch('/projects/:id', async (request, reply) => {
     const parsedParams = ProjectIdParamsSchema.parse(request.params)
     const parsedRequestBody = projectUpdateSchema.parse(request.body)
     const [result] = await db
@@ -32,7 +37,7 @@ const projectRoutes = (fastify: FastifyInstance): void => {
     reply.send(result)
   })
 
-  fastify.delete('/project/:id', async (request, reply) => {
+  fastify.delete('/projects/:id', async (request, reply) => {
     const parsedParams = ProjectIdParamsSchema.parse(request.params)
     await db.delete(project).where(eq(project.id, parsedParams.id))
     reply.code(204)
