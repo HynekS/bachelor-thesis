@@ -16,7 +16,7 @@ const projectRoutes = (fastify: FastifyInstance): void => {
 
   fastify.get('/projects/:id', async (request, reply) => {
     const parsedParams = ProjectIdParamsSchema.parse(request.params)
-    const result = await db.select().from(project).where(eq(project.id, parsedParams.id))
+    const [result] = await db.select().from(project).where(eq(project.id, parsedParams.id))
     reply.send(result)
   })
 

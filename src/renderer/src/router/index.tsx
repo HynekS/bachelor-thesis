@@ -1,19 +1,20 @@
 import CreateProjectForm from '@renderer/components/project/create-form'
+import ProjectDetail from '@renderer/pages/project-detail'
+import ProjectList from '@renderer/pages/project-list'
 import { createMemoryHistory } from '@tanstack/react-router'
 
 import { Outlet, Link, createRouter, createRoute, createRootRoute } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
+import TopNavigation from '@renderer/components/top-navigation'
 
 const rootRoute = createRootRoute({
   component: () => (
     <>
+     <TopNavigation />
       <div className="p-2 flex gap-2">
         <Link to="/" className="[&.active]:font-bold">
           Home
         </Link>{' '}
-        <Link to="/about" className="[&.active]:font-bold">
-          About
-        </Link>
         <Link to="/create-project" className="[&.active]:font-bold">
           Create new project
         </Link>
@@ -28,13 +29,13 @@ const rootRoute = createRootRoute({
 const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/',
-  component: function Index() {
-    return (
-      <div className="p-2">
-        <h3>Welcome Home!</h3>
-      </div>
-    )
-  }
+  component: () => <ProjectList />
+})
+
+const projectDetail = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/$projectId',
+  component: () => <ProjectDetail />
 })
 
 const createProjectRoute = createRoute({
@@ -43,15 +44,7 @@ const createProjectRoute = createRoute({
   component: () => <CreateProjectForm />
 })
 
-const aboutRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/about',
-  component: function About() {
-    return <div className="p-2">Hello from About!</div>
-  }
-})
-
-const routeTree = rootRoute.addChildren([indexRoute, createProjectRoute, aboutRoute])
+const routeTree = rootRoute.addChildren([indexRoute, projectDetail, createProjectRoute])
 
 const memoryHistory = createMemoryHistory({
   initialEntries: ['/']

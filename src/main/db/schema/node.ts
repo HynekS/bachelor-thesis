@@ -7,7 +7,9 @@ export const node = sqliteTable(
   {
     id: int().primaryKey({ autoIncrement: true }),
     title: text().notNull(),
-    project_id: int().references((): AnySQLiteColumn => project.id)
+    project_id: int()
+      .notNull()
+      .references((): AnySQLiteColumn => project.id)
   },
   (table) => [unique().on(table.title, table.project_id)]
 )

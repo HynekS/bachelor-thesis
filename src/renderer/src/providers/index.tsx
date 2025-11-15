@@ -1,14 +1,14 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { JSX, ReactNode } from 'react'
+import {  ReactNode } from 'react'
 import { RouterProvider } from '@tanstack/react-router'
 
 import router from '../router'
 
 interface ProviderProps {
-  children: ReactNode
+  children?: ReactNode
 }
 
-const Providers = ({ children }: ProviderProps): JSX.Element => {
+const Providers = ({ children }: ProviderProps) => {
   const queryClient = new QueryClient()
 
   return (

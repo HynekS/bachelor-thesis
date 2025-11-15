@@ -12,7 +12,8 @@ const fastify: FastifyInstance = Fastify({
 })
 
 fastify.register(cors, {
-  origin: import.meta.env.VITE_DEV_SERVER_URL
+  origin: import.meta.env.VITE_DEV_SERVER_URL,
+  methods: ['GET', 'HEAD', 'POST', 'PATCH', 'DELETE']
 })
 fastify.register(projectRoutes, { prefix })
 fastify.register(nodeRoutes, { prefix })
