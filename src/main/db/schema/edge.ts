@@ -7,9 +7,15 @@ export const edge = sqliteTable(
   'edge',
   {
     id: int().primaryKey({ autoIncrement: true }),
-    from: int().references((): AnySQLiteColumn => node.id),
-    to: int().references((): AnySQLiteColumn => node.id),
-    project_id: int().references((): AnySQLiteColumn => project.id)
+    from: int()
+      .notNull()
+      .references((): AnySQLiteColumn => node.id),
+    to: int()
+      .notNull()
+      .references((): AnySQLiteColumn => node.id),
+    project_id: int()
+      .notNull()
+      .references((): AnySQLiteColumn => project.id, { onDelete: 'cascade' })
   },
   (table) => [unique().on(table.from, table.to, table.project_id)]
 )

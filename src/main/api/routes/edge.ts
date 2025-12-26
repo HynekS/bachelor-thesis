@@ -82,15 +82,20 @@ const edgeRoutes = (fastify: FastifyInstance): void => {
       .from(edge)
       .where(and(eq(edge.from, ancestorNode.id), eq(edge.to, descendantNode.id)))
 
-    const result = await (resultFromDb ??
-      db
-        .insert(edge)
-        .values({
-          from: ancestorNode.id,
-          to: descendantNode.id,
-          project_id: parsedRequestBody.project_id
-        })
-        .returning())
+    // result is wrongly inferred as object, but in the case of insertion, it is an array!
+    // That is why this ugly bracket-fu is neccessary here
+    const [result] = await (resultFromDb
+      ? [resultFromDb]
+      : db
+          .insert(edge)
+          .values({
+            from: ancestorNode.id,
+            to: descendantNode.id,
+            project_id: parsedRequestBody.project_id
+          })
+          .returning())
+
+    console.log({ result })
 
     reply.send(result)
   })

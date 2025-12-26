@@ -37,6 +37,10 @@ yarn start
 [How to fix Error: The module 'path\node_modules\better-sqlite3\build\Release\better_sqlite3.node'
 was compiled against a different Node.js](https://github.com/WiseLibs/better-sqlite3/issues/549#issuecomment-774506826)
 
+```
+yarn run electron-rebuild -f -w better-sqlite3
+```
+
 ### Build
 
 ```bash
