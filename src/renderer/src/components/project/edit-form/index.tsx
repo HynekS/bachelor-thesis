@@ -8,7 +8,6 @@ interface EditProjectFormProps {
 }
 
 const EditProjectForm = ({ project, onSuccess }: EditProjectFormProps) => {
-  console.log(project)
   if (!project) return null
 
   const { id, title, country, region, city, district } = project

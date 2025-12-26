@@ -1,6 +1,7 @@
 import { sql } from 'drizzle-orm'
 import { AnySQLiteColumn, int, sqliteTable, text, unique } from 'drizzle-orm/sqlite-core'
 import { createInsertSchema, createUpdateSchema } from 'drizzle-zod'
+import { z } from 'zod'
 
 export const project = sqliteTable('project', {
   id: int().primaryKey({ autoIncrement: true }),
@@ -17,4 +18,5 @@ export const project = sqliteTable('project', {
 export const projectInsertSchema = createInsertSchema(project)
 export const projectUpdateSchema = createUpdateSchema(project)
 
+export type ProjectInsertSchema = z.input<typeof projectInsertSchema>
 export type Project = typeof project.$inferSelect

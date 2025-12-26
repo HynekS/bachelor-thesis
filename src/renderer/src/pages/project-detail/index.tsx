@@ -5,27 +5,32 @@ import { PencilIcon, TrashIcon } from '@heroicons/react/24/outline'
 import { useState } from 'react'
 import EditProjectForm from '@renderer/components/project/edit-form'
 import CreateNodeForm from '@renderer/components/node/create-form'
+import api from '@renderer/services/api-client'
+import { Project } from '@db/schema/project'
+import { Node } from '@db/schema/node'
+import EditNodeForm from '@renderer/components/node/edit-form'
 
 const ProjectDetail = () => {
   const { projectId } = useParams({ strict: false })
   const navigate = useNavigate()
   const [isEditMode, setIsEditMode] = useState(false)
 
+  const [activeNode, setActiveNode] = useState<Node | null>(null)
+
   const projectDetailQuery = useQuery({
     queryKey: ['projects/:id', { projectId }],
-    queryFn: () =>
-      fetch(`${import.meta.env.VITE_API_URL_PREFIXED}/projects/${projectId}`).then((res) =>
-        res.json()
-      ),
+    queryFn: () => api.get<Project>(`/projects/${projectId}`),
+    enabled: projectId != undefined
+  })
+
+  const projectNodesQuery = useQuery({
+    queryKey: ['projects/:id/nodes', { projectId }],
+    queryFn: () => api.get<Node[]>(`/projects/${projectId}/nodes`),
     enabled: projectId != undefined
   })
 
   const handleDeleteProject = () => {
-    fetch(`${import.meta.env.VITE_API_URL_PREFIXED}/projects/${projectId}`, {
-      method: 'DELETE'
-    }).then(() => {
-      navigate({ to: '/' })
-    })
+    api.delete(`/projects/${projectId}`).then(() => navigate({ to: '/' }))
   }
 
   return (
@@ -47,9 +52,29 @@ const ProjectDetail = () => {
           }}
         />
       ) : (
-        <pre>{JSON.stringify(projectDetailQuery.data, null, 2)}</pre>
+        <div>
+          <pre>{JSON.stringify(projectDetailQuery.data, null, 2)}</pre>
+          {/*<ul>
+            {projectNodesQuery.data?.map((node) => (
+              <li key={node.id}>{node.title}</li>
+            ))}
+          </ul>*/}
+          {projectNodesQuery.data?.map((node) => node.title).join(', ')}
+        </div>
       )}
-      <CreateNodeForm projectId={projectId}/>
+      {activeNode ? (
+        <EditNodeForm activeNode={activeNode} />
+      ) : (
+        <CreateNodeForm
+          projectId={projectId}
+          onSuccess={(createdNode) => {
+            if (createdNode) {
+              setActiveNode(createdNode)
+            }
+            projectNodesQuery.refetch()
+          }}
+        />
+      )}
     </div>
   )
 }

@@ -8,7 +8,7 @@ export const polygon = sqliteTable(
     id: int().primaryKey({ autoIncrement: true }),
     title: text().notNull(),
     description: text(),
-    project_id: int().references((): AnySQLiteColumn => project.id)
+    project_id: int().references((): AnySQLiteColumn => project.id, { onDelete: 'cascade' })
   },
   (table) => [unique().on(table.title, table.project_id)]
 )

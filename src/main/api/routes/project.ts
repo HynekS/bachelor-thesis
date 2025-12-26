@@ -1,7 +1,8 @@
 import { FastifyInstance } from 'fastify'
 import db from '../../db'
 import { project, projectInsertSchema, projectUpdateSchema } from '../../db/schema/project'
-import { eq } from 'drizzle-orm'
+import { node } from '../../db/schema/node'
+import { eq, asc } from 'drizzle-orm'
 import { z } from 'zod'
 
 const ProjectIdParamsSchema = z.object({
@@ -39,8 +40,18 @@ const projectRoutes = (fastify: FastifyInstance): void => {
 
   fastify.delete('/projects/:id', async (request, reply) => {
     const parsedParams = ProjectIdParamsSchema.parse(request.params)
-    await db.delete(project).where(eq(project.id, parsedParams.id))
-    reply.code(204)
+    const [result] = await db.delete(project).where(eq(project.id, parsedParams.id)).returning()
+    reply.send(result)
+  })
+
+  fastify.get('/projects/:id/nodes', async (request, reply) => {
+    const parsedParams = ProjectIdParamsSchema.parse(request.params)
+    const result = await db
+      .select()
+      .from(node)
+      .orderBy(asc(node.title))
+      .where(eq(node.project_id, parsedParams.id))
+    reply.send(result)
   })
 }
 

@@ -2,11 +2,18 @@ import { FastifyInstance } from 'fastify'
 import db from '../../db'
 import { edge, edgeInsertSchema, edgeUpdateSchema } from '../../db/schema/edge'
 
-import { eq } from 'drizzle-orm'
+import { and, eq } from 'drizzle-orm'
 import { z } from 'zod'
+import { node } from '../../db/schema/node'
 
-const EdgeIdParamsSchema = z.object({
+export const EdgeIdParamsSchema = z.object({
   id: z.coerce.number()
+})
+
+export const EdgeFromNodesParamsSchema = z.object({
+  ancestorNodeTitle: z.string(),
+  descendantNodeTitle: z.string(),
+  project_id: z.number()
 })
 
 const edgeRoutes = (fastify: FastifyInstance): void => {
@@ -37,6 +44,55 @@ const edgeRoutes = (fastify: FastifyInstance): void => {
     const parsedParams = EdgeIdParamsSchema.parse(request.params)
     await db.delete(edge).where(eq(edge.id, parsedParams.id))
     reply.code(204)
+  })
+
+  fastify.post('/edges/edgeFromNodes', async (request, reply) => {
+    const parsedRequestBody = EdgeFromNodesParamsSchema.parse(request.body)
+
+    const [ancestorNodeFromDb] = await db
+      .select()
+      .from(node)
+      .where(eq(node.title, parsedRequestBody.ancestorNodeTitle))
+
+    const ancestorNode = await (ancestorNodeFromDb ??
+      db
+        .insert(node)
+        .values({
+          project_id: parsedRequestBody.project_id,
+          title: parsedRequestBody.ancestorNodeTitle
+        })
+        .returning())
+
+    const [descendantNodeFromDb] = await db
+      .select()
+      .from(node)
+      .where(eq(node.title, parsedRequestBody.descendantNodeTitle))
+
+    const descendantNode = await (descendantNodeFromDb ??
+      db
+        .insert(node)
+        .values({
+          project_id: parsedRequestBody.project_id,
+          title: parsedRequestBody.descendantNodeTitle
+        })
+        .returning())
+
+    const [resultFromDb] = await db
+      .select()
+      .from(edge)
+      .where(and(eq(edge.from, ancestorNode.id), eq(edge.to, descendantNode.id)))
+
+    const result = await (resultFromDb ??
+      db
+        .insert(edge)
+        .values({
+          from: ancestorNode.id,
+          to: descendantNode.id,
+          project_id: parsedRequestBody.project_id
+        })
+        .returning())
+
+    reply.send(result)
   })
 }
 

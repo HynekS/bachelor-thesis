@@ -13,12 +13,14 @@ import {
 import { Input } from '@renderer/components/ui/input'
 import { Mode, modes } from '@renderer/components/form/modes'
 import { useEffect } from 'react'
+import api from '@renderer/services/api-client'
+import { Project, ProjectInsertSchema } from '@db/schema/project'
 
 interface GenericProjectFormProps {
   mode: Mode
   defaultValues: z.infer<typeof formSchema>
-  projectId?: number;
-  onSuccess?: () => void;
+  projectId?: number
+  onSuccess?: (project?: Project) => void
 }
 
 const formSchema = z.object({
@@ -31,29 +33,26 @@ const formSchema = z.object({
   district: z.string()
 })
 
-const GenericProjectForm = ({ mode, defaultValues, projectId, onSuccess }: GenericProjectFormProps) => {
+const GenericProjectForm = ({
+  mode,
+  defaultValues,
+  projectId,
+  onSuccess
+}: GenericProjectFormProps) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: defaultValues
   })
 
   const createProject = (data: z.infer<typeof formSchema>) =>
-    fetch(`${import.meta.env.VITE_API_URL_PREFIXED}/projects`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
+    api.post<Project, ProjectInsertSchema>(`/projects`, undefined, data).then((response) => {
+      onSuccess?.(response)
     })
-      .then((res) => res.json())
-      .then(() => {onSuccess?.()})
 
   const editProject = (data: z.infer<typeof formSchema>) =>
-    fetch(`${import.meta.env.VITE_API_URL_PREFIXED}/projects/${projectId}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
+    api.patch(`/projects/${projectId}`, undefined, data).then(() => {
+      onSuccess?.()
     })
-      .then((res) => res.json())
-      .then(() => {onSuccess?.()})
 
   const handler = mode === modes.create ? createProject : editProject
 

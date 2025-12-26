@@ -16,9 +16,14 @@ const nodeRoutes = (fastify: FastifyInstance): void => {
   })
 
   fastify.post('/nodes', async (request, reply) => {
-    const parsedRequestBody = nodeInsertSchema.parse(request.body)
-    const [result] = await db.insert(node).values(parsedRequestBody).returning()
-    reply.send(result)
+    try {
+      const parsedRequestBody = nodeInsertSchema.parse(request.body)
+      const [result] = await db.insert(node).values(parsedRequestBody).returning()
+      reply.send(result)
+    } catch (error) {
+      reply.statusCode = 400
+      reply.send(error)
+    }
   })
 
   fastify.patch('/nodes', async (request, reply) => {
@@ -34,8 +39,8 @@ const nodeRoutes = (fastify: FastifyInstance): void => {
 
   fastify.delete('/nodes/:id', async (request, reply) => {
     const parsedParams = NodeIdParamsSchema.parse(request.params)
-    await db.delete(node).where(eq(node.id, parsedParams.id))
-    reply.code(204)
+    const [response] = await db.delete(node).where(eq(node.id, parsedParams.id)).returning()
+    reply.send(response)
   })
 }
 

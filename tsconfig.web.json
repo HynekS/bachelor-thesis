@@ -19,5 +19,6 @@
         "src/main/db/*"
       ]
     }
-  }
+  },
+  "noUncheckedIndexedAccess": true,
 }

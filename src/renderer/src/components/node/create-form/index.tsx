@@ -12,10 +12,12 @@ import {
 } from '@renderer/components/ui/form'
 import { Input } from '@renderer/components/ui/input'
 import { useEffect } from 'react'
+import api from '@renderer/services/api-client'
+import { Node } from '@db/schema/node'
 
 interface CreateNodeFormProps {
-  projectId: string;
-  onSuccess?: () => void;
+  projectId: string | undefined
+  onSuccess?: (createdNode?: Node) => void
 }
 
 const formSchema = z.object({
@@ -34,18 +36,15 @@ const CreateNodeForm = ({ projectId, onSuccess }: CreateNodeFormProps) => {
     }
   })
 
-  const createNode = (data: z.infer<typeof formSchema>) => fetch(`${import.meta.env.VITE_API_URL_PREFIXED}/nodes`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        ...data,
-        project_id: Number(data.project_id)
+  const createNode = (data: z.infer<typeof formSchema>) =>
+    api
+      .post<Node>(`/nodes`, undefined, { ...data, project_id: Number(data.project_id) })
+      .then((response) => {
+        onSuccess?.(response)
+        return response
       })
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data)
-        onSuccess?.()
+      .catch((error) => {
+        form.setError('title', { message: error.message })
       })
 
   useEffect(() => {

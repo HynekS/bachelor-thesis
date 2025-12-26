@@ -9,10 +9,12 @@ export const node = sqliteTable(
     title: text().notNull(),
     project_id: int()
       .notNull()
-      .references((): AnySQLiteColumn => project.id)
+      .references((): AnySQLiteColumn => project.id, { onDelete: 'cascade' })
   },
   (table) => [unique().on(table.title, table.project_id)]
 )
+
+export type Node = typeof node.$inferSelect
 
 export const nodeInsertSchema = createInsertSchema(node)
 export const nodeUpdateSchema = createUpdateSchema(node)
