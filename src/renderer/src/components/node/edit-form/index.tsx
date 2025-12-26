@@ -27,20 +27,42 @@ const formSchema = z.object({
 
 const EditNodeForm = ({ activeNode }: EditNodeFormProps) => {
   const descentantsForm = useForm({
-    // resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema),
     defaultValues: {
       project_id: activeNode.project_id,
       title: ''
     }
   })
 
-  const ancestorsForm = useForm()
+  const ancestorsForm = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      project_id: activeNode.project_id,
+      title: ''
+    }
+  })
 
   const createDescendantNodeAndEdge = (data: z.infer<typeof formSchema>) =>
     api
       .post(`/edges/edgeFromNodes`, undefined, {
         ancestorNodeTitle: activeNode.title,
         descendantNodeTitle: data.title,
+        project_id: Number(data.project_id)
+      })
+      .then((response) => {
+        console.log(response)
+        //onSuccess?.(response)
+        return response
+      })
+      .catch((error) => {
+        descentantsForm.setError('title', { message: error.message })
+      })
+
+  const createAncestorNodeAndEdge = (data: z.infer<typeof formSchema>) =>
+    api
+      .post(`/edges/edgeFromNodes`, undefined, {
+        ancestorNodeTitle: data.title,
+        descendantNodeTitle: activeNode.title,
         project_id: Number(data.project_id)
       })
       .then((response) => {
@@ -77,23 +99,27 @@ const EditNodeForm = ({ activeNode }: EditNodeFormProps) => {
       </Form>
 
       <div>{activeNode.title}</div>
-      {/*<Form {...ancestorsForm}>
-        <form onSubmit={() => {}} className="space-y-8"></form>
-        <FormField
-          control={ancestorsForm.control}
-          name="title"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Unit identifier</FormLabel>
-              <FormControl>
-                <Input {...field} />
-              </FormControl>
-              <Button type="submit">Save</Button>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      </Form>*/}
+      <Form {...ancestorsForm}>
+        <form
+          onSubmit={ancestorsForm.handleSubmit(createAncestorNodeAndEdge)}
+          className="space-y-8"
+        >
+          <FormField
+            control={ancestorsForm.control}
+            name="title"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Unit identifier</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <Button type="submit">Save</Button>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </form>
+      </Form>
     </div>
   )
 }

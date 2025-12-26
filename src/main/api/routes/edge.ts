@@ -56,13 +56,15 @@ const edgeRoutes = (fastify: FastifyInstance): void => {
 
     const ancestorNode =
       ancestorNodeFromDb ??
-      (await db
-        .insert(node)
-        .values({
-          project_id: parsedRequestBody.project_id,
-          title: parsedRequestBody.ancestorNodeTitle
-        })
-        .returning()[0])
+      (
+        await db
+          .insert(node)
+          .values({
+            project_id: parsedRequestBody.project_id,
+            title: parsedRequestBody.ancestorNodeTitle
+          })
+          .returning()
+      )[0]
 
     const [descendantNodeFromDb] = await db
       .select()
@@ -71,13 +73,17 @@ const edgeRoutes = (fastify: FastifyInstance): void => {
 
     const descendantNode =
       descendantNodeFromDb ??
-      (await db
-        .insert(node)
-        .values({
-          project_id: parsedRequestBody.project_id,
-          title: parsedRequestBody.descendantNodeTitle
-        })
-        .returning()[0])
+      (
+        await db
+          .insert(node)
+          .values({
+            project_id: parsedRequestBody.project_id,
+            title: parsedRequestBody.descendantNodeTitle
+          })
+          .returning()
+      )[0]
+
+    console.log({ ancestorNode, descendantNode })
 
     const [resultFromDb] = await db
       .select()
