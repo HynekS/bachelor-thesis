@@ -54,48 +54,48 @@ const edgeRoutes = (fastify: FastifyInstance): void => {
       .from(node)
       .where(eq(node.title, parsedRequestBody.ancestorNodeTitle))
 
-    const ancestorNode = await (ancestorNodeFromDb ??
-      db
+    const ancestorNode =
+      ancestorNodeFromDb ??
+      (await db
         .insert(node)
         .values({
           project_id: parsedRequestBody.project_id,
           title: parsedRequestBody.ancestorNodeTitle
         })
-        .returning())
+        .returning()[0])
 
     const [descendantNodeFromDb] = await db
       .select()
       .from(node)
       .where(eq(node.title, parsedRequestBody.descendantNodeTitle))
 
-    const descendantNode = await (descendantNodeFromDb ??
-      db
+    const descendantNode =
+      descendantNodeFromDb ??
+      (await db
         .insert(node)
         .values({
           project_id: parsedRequestBody.project_id,
           title: parsedRequestBody.descendantNodeTitle
         })
-        .returning())
+        .returning()[0])
 
     const [resultFromDb] = await db
       .select()
       .from(edge)
       .where(and(eq(edge.from, ancestorNode.id), eq(edge.to, descendantNode.id)))
 
-    // result is wrongly inferred as object, but in the case of insertion, it is an array!
-    // That is why this ugly bracket-fu is neccessary here
-    const [result] = await (resultFromDb
-      ? [resultFromDb]
-      : db
+    const result =
+      resultFromDb ??
+      (
+        await db
           .insert(edge)
           .values({
             from: ancestorNode.id,
             to: descendantNode.id,
             project_id: parsedRequestBody.project_id
           })
-          .returning())
-
-    console.log({ result })
+          .returning()
+      )[0]
 
     reply.send(result)
   })
