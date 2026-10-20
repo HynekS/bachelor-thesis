@@ -20,5 +20,7 @@ export const edge = sqliteTable(
   (table) => [unique().on(table.from, table.to, table.project_id)]
 )
 
+export type Edge = typeof edge.$inferSelect
+
 export const edgeInsertSchema = createInsertSchema(edge)
 export const edgeUpdateSchema = createUpdateSchema(edge)

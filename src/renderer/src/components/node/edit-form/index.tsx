@@ -13,6 +13,8 @@ import { Button } from '@renderer/components/ui/button'
 import api from '@renderer/services/api-client'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
+import useDebounce from '@renderer/hooks/use-debounce'
+import { useQuery } from '@tanstack/react-query'
 
 interface EditNodeFormProps {
   activeNode: Node
@@ -50,7 +52,6 @@ const EditNodeForm = ({ activeNode }: EditNodeFormProps) => {
         project_id: Number(data.project_id)
       })
       .then((response) => {
-        console.log(response)
         //onSuccess?.(response)
         return response
       })
@@ -66,13 +67,27 @@ const EditNodeForm = ({ activeNode }: EditNodeFormProps) => {
         project_id: Number(data.project_id)
       })
       .then((response) => {
-        console.log(response)
         //onSuccess?.(response)
         return response
       })
       .catch((error) => {
         ancestorsForm.setError('title', { message: error.message })
       })
+
+  const nodeTitleForAutocomplete = descentantsForm.watch('title')
+  const debouncedNodeTitleForAutocomplete = useDebounce(nodeTitleForAutocomplete, 250)
+
+  const autocompleteNodesQuery = useQuery({
+    queryKey: ['/nodes/search-by-title', activeNode.project_id, debouncedNodeTitleForAutocomplete],
+    queryFn: () =>
+      api.get<Node[]>('/nodes/search-by-title', {
+        project_id: activeNode.project_id,
+        searchString: debouncedNodeTitleForAutocomplete
+      }),
+    enabled: debouncedNodeTitleForAutocomplete.length > 0
+  })
+
+  console.log(autocompleteNodesQuery.data)
 
   return (
     <div>

@@ -1,11 +1,17 @@
 import { FastifyInstance } from 'fastify'
 import db from '../../db'
 import { node, nodeInsertSchema, nodeUpdateSchema } from '../../db/schema/node'
-import { eq } from 'drizzle-orm'
+import { and, eq, like } from 'drizzle-orm'
 import { z } from 'zod'
+import { lower } from '../../db/utils'
 
 const NodeIdParamsSchema = z.object({
   id: z.coerce.number()
+})
+
+const searchByTitleParamsSchema = z.object({
+  project_id: z.coerce.number(),
+  searchString: z.string()
 })
 
 const nodeRoutes = (fastify: FastifyInstance): void => {
@@ -41,6 +47,21 @@ const nodeRoutes = (fastify: FastifyInstance): void => {
     const parsedParams = NodeIdParamsSchema.parse(request.params)
     const [response] = await db.delete(node).where(eq(node.id, parsedParams.id)).returning()
     reply.send(response)
+  })
+
+  fastify.get('/nodes/search-by-title', async (request, reply) => {
+    const parsedParams = searchByTitleParamsSchema.parse(request.query)
+    const matches = await db
+      .select()
+      .from(node)
+      .where(
+        and(
+          eq(node.project_id, parsedParams.project_id),
+          like(lower(node.title), `${parsedParams.searchString.toLowerCase()}%`)
+        )
+      )
+
+    reply.send(matches)
   })
 }
 

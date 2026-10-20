@@ -83,8 +83,6 @@ const edgeRoutes = (fastify: FastifyInstance): void => {
           .returning()
       )[0]
 
-    console.log({ ancestorNode, descendantNode })
-
     const [resultFromDb] = await db
       .select()
       .from(edge)

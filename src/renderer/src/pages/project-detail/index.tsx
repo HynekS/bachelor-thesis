@@ -9,6 +9,8 @@ import api from '@renderer/services/api-client'
 import { Project } from '@db/schema/project'
 import { Node } from '@db/schema/node'
 import EditNodeForm from '@renderer/components/node/edit-form'
+import Diagram from '@renderer/components/diagram'
+import { Edge } from '@db/schema/edge'
 
 const ProjectDetail = () => {
   const { projectId } = useParams({ strict: false })
@@ -28,6 +30,15 @@ const ProjectDetail = () => {
     queryFn: () => api.get<Node[]>(`/projects/${projectId}/nodes`),
     enabled: projectId != undefined
   })
+
+  const projectEdgesQuery = useQuery({
+    queryKey: ['projects/:id/edges', { projectId }],
+    queryFn: () => api.get<Edge[]>(`/projects/${projectId}/edges`),
+    enabled: projectId != undefined
+  })
+
+  const projectNodes = projectNodesQuery.data
+  const projectEdges = projectEdgesQuery.data
 
   const handleDeleteProject = () => {
     api.delete(`/projects/${projectId}`).then(() => navigate({ to: '/' }))
@@ -53,13 +64,13 @@ const ProjectDetail = () => {
         />
       ) : (
         <div>
-          <pre>{JSON.stringify(projectDetailQuery.data, null, 2)}</pre>
+          {/*<pre>{JSON.stringify(projectDetailQuery.data, null, 2)}</pre>*/}
           {/*<ul>
             {projectNodesQuery.data?.map((node) => (
               <li key={node.id}>{node.title}</li>
             ))}
           </ul>*/}
-          {projectNodesQuery.data?.map((node) => node.title).join(', ')}
+          {projectNodes?.map((node) => node.title).join(', ')}
         </div>
       )}
       {activeNode ? (
@@ -75,6 +86,7 @@ const ProjectDetail = () => {
           }}
         />
       )}
+      <Diagram initialEdges={projectEdges ?? []} initialNodes={projectNodes ?? []} />
     </div>
   )
 }

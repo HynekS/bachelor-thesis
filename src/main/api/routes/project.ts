@@ -2,6 +2,7 @@ import { FastifyInstance } from 'fastify'
 import db from '../../db'
 import { project, projectInsertSchema, projectUpdateSchema } from '../../db/schema/project'
 import { node } from '../../db/schema/node'
+import { edge } from '../../db/schema/edge'
 import { eq, asc } from 'drizzle-orm'
 import { z } from 'zod'
 
@@ -51,6 +52,12 @@ const projectRoutes = (fastify: FastifyInstance): void => {
       .from(node)
       .orderBy(asc(node.title))
       .where(eq(node.project_id, parsedParams.id))
+    reply.send(result)
+  })
+
+  fastify.get('/projects/:id/edges', async (request, reply) => {
+    const parsedParams = ProjectIdParamsSchema.parse(request.params)
+    const result = await db.select().from(edge).where(eq(edge.project_id, parsedParams.id))
     reply.send(result)
   })
 }
