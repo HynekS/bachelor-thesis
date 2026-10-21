@@ -9,8 +9,9 @@ import api from '@renderer/services/api-client'
 import { Project } from '@db/schema/project'
 import { Node } from '@db/schema/node'
 import EditNodeForm from '@renderer/components/node/edit-form'
-import Diagram from '@renderer/components/diagram'
+// import Diagram from '@renderer/components/diagram'
 import { Edge } from '@db/schema/edge'
+import ElkDiagram from '@renderer/components/elk-diagram'
 
 const ProjectDetail = () => {
   const { projectId } = useParams({ strict: false })
@@ -86,7 +87,7 @@ const ProjectDetail = () => {
           }}
         />
       )}
-      <Diagram initialEdges={projectEdges ?? []} initialNodes={projectNodes ?? []} />
+      <ElkDiagram initialEdges={projectEdges ?? []} initialNodes={projectNodes ?? []} />
     </div>
   )
 }
