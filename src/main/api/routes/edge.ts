@@ -52,7 +52,12 @@ const edgeRoutes = (fastify: FastifyInstance): void => {
     const [ancestorNodeFromDb] = await db
       .select()
       .from(node)
-      .where(eq(node.title, parsedRequestBody.ancestorNodeTitle))
+      .where(
+        and(
+          eq(node.project_id, parsedRequestBody.project_id),
+          eq(node.title, parsedRequestBody.ancestorNodeTitle)
+        )
+      )
 
     const ancestorNode =
       ancestorNodeFromDb ??
@@ -69,7 +74,12 @@ const edgeRoutes = (fastify: FastifyInstance): void => {
     const [descendantNodeFromDb] = await db
       .select()
       .from(node)
-      .where(eq(node.title, parsedRequestBody.descendantNodeTitle))
+      .where(
+        and(
+          eq(node.project_id, parsedRequestBody.project_id),
+          eq(node.title, parsedRequestBody.descendantNodeTitle)
+        )
+      )
 
     const descendantNode =
       descendantNodeFromDb ??

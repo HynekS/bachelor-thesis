@@ -1,5 +1,5 @@
 import ELK from 'elkjs/lib/elk.bundled.js'
-import { useCallback } from 'react'
+import { useCallback, useEffect } from 'react'
 import {
   ReactFlow,
   ReactFlowProvider,
@@ -79,6 +79,10 @@ const LayoutFlow = ({ initialNodes, initialEdges }: LayoutFlowProps) => {
   const [nodes, , onNodesChange] = useNodesState(initialNodes)
   const [edges, , onEdgesChange] = useEdgesState(initialEdges)
   const { getLayoutedElements } = useLayoutedElements()
+
+  useEffect(() => {
+    getLayoutedElements({})
+  }, [])
 
   return (
     <div style={{ height: 800 }}>

@@ -2,7 +2,7 @@ import { Button } from '@renderer/components/ui/button'
 import { useQuery } from '@tanstack/react-query'
 import { useParams, useNavigate } from '@tanstack/react-router'
 import { PencilIcon, TrashIcon } from '@heroicons/react/24/outline'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import EditProjectForm from '@renderer/components/project/edit-form'
 import CreateNodeForm from '@renderer/components/node/create-form'
 import api from '@renderer/services/api-client'
@@ -11,7 +11,9 @@ import { Node } from '@db/schema/node'
 import EditNodeForm from '@renderer/components/node/edit-form'
 // import Diagram from '@renderer/components/diagram'
 import { Edge } from '@db/schema/edge'
-import ElkDiagram from '@renderer/components/elk-diagram'
+import ElkDiagramProvider from '@renderer/components/diagram-provider'
+import ElkDiagramAlt from '@renderer/components/elk-diagram-alt'
+import { mapEdge, mapNode } from '@renderer/components/elk-diagram-alt/mappers'
 
 const ProjectDetail = () => {
   const { projectId } = useParams({ strict: false })
@@ -38,8 +40,13 @@ const ProjectDetail = () => {
     enabled: projectId != undefined
   })
 
-  const projectNodes = projectNodesQuery.data
-  const projectEdges = projectEdgesQuery.data
+  const initialNodesAndEdges = useMemo(() => {
+    if (!projectNodesQuery.data || !projectEdgesQuery.data) return null
+    return {
+      initialNodes: projectNodesQuery.data.map(mapNode),
+      initialEdges: projectEdgesQuery.data.map(mapEdge)
+    }
+  }, [projectEdgesQuery.data, projectNodesQuery.data])
 
   const handleDeleteProject = () => {
     api.delete(`/projects/${projectId}`).then(() => navigate({ to: '/' }))
@@ -64,18 +71,10 @@ const ProjectDetail = () => {
           }}
         />
       ) : (
-        <div>
-          {/*<pre>{JSON.stringify(projectDetailQuery.data, null, 2)}</pre>*/}
-          {/*<ul>
-            {projectNodesQuery.data?.map((node) => (
-              <li key={node.id}>{node.title}</li>
-            ))}
-          </ul>*/}
-          {projectNodes?.map((node) => node.title).join(', ')}
-        </div>
+        <div>{projectNodesQuery.data?.map((node) => node.title).join(', ')}</div>
       )}
       {activeNode ? (
-        <EditNodeForm activeNode={activeNode} />
+        <EditNodeForm activeNode={activeNode} onSuccess={() => projectEdgesQuery.refetch()} />
       ) : (
         <CreateNodeForm
           projectId={projectId}
@@ -87,7 +86,13 @@ const ProjectDetail = () => {
           }}
         />
       )}
-      <ElkDiagram initialEdges={projectEdges ?? []} initialNodes={projectNodes ?? []} />
+      <ElkDiagramProvider>
+        {initialNodesAndEdges ? (
+          <ElkDiagramAlt initialNodesAndEdges={initialNodesAndEdges} />
+        ) : (
+          'Loading…'
+        )}
+      </ElkDiagramProvider>
     </div>
   )
 }

@@ -12,7 +12,8 @@ interface DiagramProps {
 const mapEdge = (edge: Edge) => ({
   id: `${edge.id}`,
   source: `${edge.from}`,
-  target: `${edge.to}`
+  target: `${edge.to}`,
+  type: 'step'
 })
 const mapNode = (node: Node) => ({
   id: `${node.id}`,

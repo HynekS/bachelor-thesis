@@ -15,9 +15,11 @@ import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import useDebounce from '@renderer/hooks/use-debounce'
 import { useQuery } from '@tanstack/react-query'
+import { useEffect } from 'react'
 
 interface EditNodeFormProps {
   activeNode: Node
+  onSuccess: () => void
 }
 
 const formSchema = z.object({
@@ -27,7 +29,7 @@ const formSchema = z.object({
   })
 })
 
-const EditNodeForm = ({ activeNode }: EditNodeFormProps) => {
+const EditNodeForm = ({ activeNode, onSuccess }: EditNodeFormProps) => {
   const descentantsForm = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -52,7 +54,7 @@ const EditNodeForm = ({ activeNode }: EditNodeFormProps) => {
         project_id: Number(data.project_id)
       })
       .then((response) => {
-        //onSuccess?.(response)
+        onSuccess?.()
         return response
       })
       .catch((error) => {
@@ -67,7 +69,7 @@ const EditNodeForm = ({ activeNode }: EditNodeFormProps) => {
         project_id: Number(data.project_id)
       })
       .then((response) => {
-        //onSuccess?.(response)
+        onSuccess?.()
         return response
       })
       .catch((error) => {
@@ -87,7 +89,16 @@ const EditNodeForm = ({ activeNode }: EditNodeFormProps) => {
     enabled: debouncedNodeTitleForAutocomplete.length > 0
   })
 
-  console.log(autocompleteNodesQuery.data)
+  useEffect(() => {
+    if (descentantsForm.formState.isSubmitSuccessful) {
+      descentantsForm.reset()
+    }
+    if (ancestorsForm.formState.isSubmitSuccessful) {
+      ancestorsForm.reset()
+    }
+  }, [descentantsForm, ancestorsForm])
+
+  // console.log(autocompleteNodesQuery.data)
 
   return (
     <div>

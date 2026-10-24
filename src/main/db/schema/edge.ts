@@ -9,10 +9,10 @@ export const edge = sqliteTable(
     id: int().primaryKey({ autoIncrement: true }),
     from: int()
       .notNull()
-      .references((): AnySQLiteColumn => node.id),
+      .references((): AnySQLiteColumn => node.id, { onDelete: 'cascade' }),
     to: int()
       .notNull()
-      .references((): AnySQLiteColumn => node.id),
+      .references((): AnySQLiteColumn => node.id, { onDelete: 'cascade' }),
     project_id: int()
       .notNull()
       .references((): AnySQLiteColumn => project.id, { onDelete: 'cascade' })
