@@ -1,7 +1,7 @@
 import { Button } from '@renderer/components/ui/button'
 import { useQuery } from '@tanstack/react-query'
 import { useParams, useNavigate } from '@tanstack/react-router'
-import { PencilIcon, TrashIcon } from '@heroicons/react/24/outline'
+import { PencilIcon } from '@heroicons/react/24/outline'
 import { useMemo, useState } from 'react'
 import EditProjectForm from '@renderer/components/project/edit-form'
 import CreateNodeForm from '@renderer/components/node/create-form'
@@ -14,6 +14,7 @@ import { Edge } from '@db/schema/edge'
 import ElkDiagramProvider from '@renderer/components/diagram-provider'
 import ElkDiagramAlt from '@renderer/components/elk-diagram-alt'
 import { mapEdge, mapNode } from '@renderer/components/elk-diagram-alt/mappers'
+import DeleteDialog from '@renderer/components/project/delete-dialog'
 
 const ProjectDetail = () => {
   const { projectId } = useParams({ strict: false })
@@ -58,9 +59,7 @@ const ProjectDetail = () => {
         <Button onClick={() => setIsEditMode(true)}>
           <PencilIcon className="size-5" />
         </Button>
-        <Button onClick={handleDeleteProject}>
-          <TrashIcon className="size-5" />
-        </Button>
+        <DeleteDialog handleDeleteProject={handleDeleteProject} />
       </div>
       {isEditMode ? (
         <EditProjectForm
