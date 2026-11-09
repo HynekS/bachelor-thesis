@@ -2,7 +2,8 @@ import {
   ReactFlow,
   useReactFlow,
   Node as ReactFlowNode,
-  Edge as ReactFlowEdge
+  Edge as ReactFlowEdge,
+  Controls
 } from '@xyflow/react'
 import getElkLayout from './get-elk-layout'
 import { useEffect } from 'react'
@@ -23,12 +24,18 @@ const ElkDiagramAlt = ({ initialNodesAndEdges }: ElkdiagramAltProps) => {
       const { nodes, edges } = await getElkLayout(getNodes(), getEdges(), 'UP')
       setNodes(nodes)
       setEdges(edges)
-      fitView()
+      setTimeout(() => {
+        fitView()
+      }, 10)
     }
     handler()
-  }, [nodes, edges])
+  }, [nodes, edges, fitView, getNodes, getEdges, setNodes, setEdges])
 
-  return <ReactFlow defaultNodes={nodes} defaultEdges={edges} nodes={nodes} edges={edges} />
+  return (
+    <ReactFlow defaultNodes={nodes} defaultEdges={edges} nodes={nodes} edges={edges} fitView>
+      <Controls />
+    </ReactFlow>
+  )
 }
 
 export default ElkDiagramAlt

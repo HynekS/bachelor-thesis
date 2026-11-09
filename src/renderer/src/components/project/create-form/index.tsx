@@ -18,7 +18,7 @@ const CreateProjectForm = () => {
       onSuccess={(createdProject) => {
         if (createdProject)
           router.navigate({
-            to: `/${createdProject.id}`
+            to: `/projects/${createdProject.id}`
           })
       }}
     />

@@ -1,6 +1,6 @@
 import { Button } from '@renderer/components/ui/button'
 import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/24/outline'
-import { useCanGoBack, useRouter, useRouterState } from '@tanstack/react-router'
+import { Link, useCanGoBack, useRouter, useRouterState } from '@tanstack/react-router'
 
 const TopNavigation = () => {
   const router = useRouter()
@@ -11,7 +11,10 @@ const TopNavigation = () => {
   })
 
   return (
-    <div className="p-3 flex gap-1 shadow-lg">
+    <div className="p-3 flex items-center gap-1 shadow-lg">
+      <Link to={'/'} className="[&.active]:font-bold mr-1">
+        Home
+      </Link>
       <Button onClick={() => router.history.back()} disabled={!canGoBack}>
         <ArrowLeftIcon className="size-5" />
       </Button>

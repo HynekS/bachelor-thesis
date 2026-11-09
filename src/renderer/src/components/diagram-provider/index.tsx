@@ -9,8 +9,10 @@ interface ElkDiagramProviderProps {
 
 const ElkDiagramProvider = ({ children }: ElkDiagramProviderProps) => {
   return (
-    <div className="w-full h-screen ">
-      <ReactFlowProvider>{children}</ReactFlowProvider>
+    <div className="flex w-full h-screen">
+      <div className="flex-1">
+        <ReactFlowProvider>{children}</ReactFlowProvider>
+      </div>
     </div>
   )
 }

@@ -4,6 +4,8 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { fastify } from './api'
 import { runMigration } from './db'
+import { handleOnPrint } from './utils'
+import { ipcMain } from 'electron/main'
 
 function createWindow(): void {
   // Create the browser window.
@@ -73,6 +75,8 @@ app.whenReady().then(() => {
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
+
+  ipcMain.on('print', handleOnPrint)
 })
 
 // Quit when all windows are closed, except on macOS. There, it's common
