@@ -2,10 +2,14 @@ import { app } from 'electron'
 import path from 'path'
 import { cpSync, existsSync } from 'fs'
 import 'dotenv/config'
-import { drizzle } from 'drizzle-orm/better-sqlite3'
-import { migrate } from 'drizzle-orm/better-sqlite3/migrator'
+import { drizzle } from 'drizzle-orm/libsql'
+import { migrate } from 'drizzle-orm/libsql/migrator'
+import { createClient } from '@libsql/client'
 
-const db = drizzle({ connection: { source: process.env.DATABASE_URL } })
+const client = createClient({
+  url: `file:${path.join(app.getPath('userData'), 'database.sqlite')}`
+})
+const db = drizzle({ client })
 
 const sourceMigrations = app.isPackaged
   ? path.join(__dirname, './migrations')

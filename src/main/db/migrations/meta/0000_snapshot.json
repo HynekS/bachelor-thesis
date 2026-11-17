@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "524d5b77-6046-40d2-a5c8-7f0a96b042e0",
+  "id": "b161ba71-8930-4acb-a220-ebd51658bd1c",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "edge": {
@@ -18,21 +18,21 @@
           "name": "from",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         },
         "to": {
           "name": "to",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         },
         "project_id": {
           "name": "project_id",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         }
       },
@@ -58,7 +58,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         },
         "edge_to_node_id_fk": {
@@ -71,7 +71,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         },
         "edge_project_id_project_id_fk": {
@@ -325,6 +325,65 @@
         }
       },
       "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "sections_to_polygons": {
+      "name": "sections_to_polygons",
+      "columns": {
+        "polygon_id": {
+          "name": "polygon_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "section_id": {
+          "name": "section_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "sections_to_polygons_polygon_id_polygon_id_fk": {
+          "name": "sections_to_polygons_polygon_id_polygon_id_fk",
+          "tableFrom": "sections_to_polygons",
+          "tableTo": "polygon",
+          "columnsFrom": [
+            "polygon_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "sections_to_polygons_section_id_section_id_fk": {
+          "name": "sections_to_polygons_section_id_section_id_fk",
+          "tableFrom": "sections_to_polygons",
+          "tableTo": "section",
+          "columnsFrom": [
+            "section_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "sections_to_polygons_pk": {
+          "columns": [
+            "polygon_id",
+            "section_id"
+          ],
+          "name": "sections_to_polygons_pk"
+        }
+      },
       "uniqueConstraints": {},
       "checkConstraints": {}
     }

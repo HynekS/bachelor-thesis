@@ -1,10 +1,10 @@
 CREATE TABLE `edge` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-	`from` integer,
-	`to` integer,
-	`project_id` integer,
-	FOREIGN KEY (`from`) REFERENCES `node`(`id`) ON UPDATE no action ON DELETE no action,
-	FOREIGN KEY (`to`) REFERENCES `node`(`id`) ON UPDATE no action ON DELETE no action,
+	`from` integer NOT NULL,
+	`to` integer NOT NULL,
+	`project_id` integer NOT NULL,
+	FOREIGN KEY (`from`) REFERENCES `node`(`id`) ON UPDATE no action ON DELETE cascade,
+	FOREIGN KEY (`to`) REFERENCES `node`(`id`) ON UPDATE no action ON DELETE cascade,
 	FOREIGN KEY (`project_id`) REFERENCES `project`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
@@ -44,4 +44,11 @@ CREATE TABLE `section` (
 	FOREIGN KEY (`project_id`) REFERENCES `project`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
-CREATE UNIQUE INDEX `section_title_project_id_unique` ON `section` (`title`,`project_id`);
+CREATE UNIQUE INDEX `section_title_project_id_unique` ON `section` (`title`,`project_id`);--> statement-breakpoint
+CREATE TABLE `sections_to_polygons` (
+	`polygon_id` integer NOT NULL,
+	`section_id` integer NOT NULL,
+	PRIMARY KEY(`polygon_id`, `section_id`),
+	FOREIGN KEY (`polygon_id`) REFERENCES `polygon`(`id`) ON UPDATE no action ON DELETE no action,
+	FOREIGN KEY (`section_id`) REFERENCES `section`(`id`) ON UPDATE no action ON DELETE no action
+);
