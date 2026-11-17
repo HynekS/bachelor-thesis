@@ -1,5 +1,5 @@
 import { sql } from 'drizzle-orm'
-import { AnySQLiteColumn, int, sqliteTable, text, unique } from 'drizzle-orm/sqlite-core'
+import { int, sqliteTable, text } from 'drizzle-orm/sqlite-core'
 import { createInsertSchema, createUpdateSchema } from 'drizzle-zod'
 import { z } from 'zod'
 
