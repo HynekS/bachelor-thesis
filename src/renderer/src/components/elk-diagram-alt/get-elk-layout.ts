@@ -1,20 +1,24 @@
-import { type Edge as ReactFlowEdge, Node as ReactFlowNode } from '@xyflow/react'
+import { type Edge as ReactFlowEdge, Node as ReactFlowNode, Position } from '@xyflow/react'
 import ELK from 'elkjs/lib/elk.bundled.js'
 import { ElkNode } from 'elkjs/lib/elk.bundled'
-export type DagreLayoutDirections = 'TB' | 'LR'
-export type ElkDirectionType = 'RIGHT' | 'LEFT' | 'UP' | 'DOWN'
+
+export type ElkDirection = 'DOWN' | 'UP' | 'RIGHT' | 'LEFT'
+
+export const handlePositions: Record<
+  ElkDirection,
+  { targetPosition: Position; sourcePosition: Position }
+> = {
+  DOWN: { targetPosition: Position.Top, sourcePosition: Position.Bottom },
+  UP: { targetPosition: Position.Bottom, sourcePosition: Position.Top },
+  RIGHT: { targetPosition: Position.Left, sourcePosition: Position.Right },
+  LEFT: { targetPosition: Position.Right, sourcePosition: Position.Left }
+}
 
 export default async function getElkLayout(
   nodes: ReactFlowNode[] = [],
   edges: ReactFlowEdge[] = [],
-  direction: ElkDirectionType = 'RIGHT'
+  direction: ElkDirection = 'RIGHT'
 ) {
-  const isRight = direction === 'RIGHT'
-  const isLeft = direction === 'LEFT'
-  const isUp = direction === 'UP'
-  const targetPosition = isRight ? 'left' : isLeft ? 'right' : isUp ? 'bottom' : 'top'
-  const sourcePosition = isRight ? 'right' : isLeft ? 'left' : isUp ? 'top' : 'bottom'
-
   const elk = new ELK()
 
   const graph: ElkNode = {
@@ -60,8 +64,9 @@ export default async function getElkLayout(
           x: node.x,
           y: node.y
         },
-        sourcePosition,
-        targetPosition
+        //sourcePosition,
+        //targetPosition,
+        ...handlePositions[direction]
       } as ReactFlowNode
     }),
     edges: (layout.edges ?? []).map((edge) => {
