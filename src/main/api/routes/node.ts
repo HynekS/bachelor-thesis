@@ -4,6 +4,7 @@ import { node, nodeInsertSchema, nodeUpdateSchema } from '../../db/schema/node'
 import { and, eq, like } from 'drizzle-orm'
 import { z } from 'zod'
 import { lower } from '../../db/utils'
+import { edge } from '../../db/schema'
 
 const NodeIdParamsSchema = z.object({
   id: z.coerce.number()
@@ -12,6 +13,21 @@ const NodeIdParamsSchema = z.object({
 const searchByTitleParamsSchema = z.object({
   project_id: z.coerce.number(),
   searchString: z.string()
+})
+
+const nodeFromEdgeBodySchema = z.object({
+  project_id: z.coerce.number(),
+  edge: z
+    .object({
+      from: z.number(),
+      to: z.number()
+    })
+    .partial()
+    .refine(
+      (data) => data.from || data.to,
+      'Either "from" or "to" (id of existing node) must be specified.'
+    )
+  // TO consider: node does not have to be specified, unless some meta properties will be stored (e.g., position in view)
 })
 
 const nodeRoutes = (fastify: FastifyInstance): void => {
@@ -62,6 +78,40 @@ const nodeRoutes = (fastify: FastifyInstance): void => {
       )
 
     reply.send(matches)
+  })
+
+  fastify.post('/nodes/node-from-edge', async (request, reply) => {
+    try {
+      const parsedRequestBody = nodeFromEdgeBodySchema.parse(request.body)
+
+      const [createdNode] = await db
+        .insert(node)
+        .values({ project_id: parsedRequestBody.project_id, title: 'Untitled' })
+        .returning()
+
+      if (!createdNode) throw new Error('Unable to create new node')
+
+      const isCreatedNodeTarget = Boolean(parsedRequestBody.edge.from)
+
+      const [createdEdge] = await db
+        .insert(edge)
+        .values({
+          project_id: parsedRequestBody.project_id,
+          from: isCreatedNodeTarget ? parsedRequestBody.edge.from : createdNode.id,
+          to: isCreatedNodeTarget ? createdNode.id : parsedRequestBody.edge.to
+        })
+        .returning()
+
+      const result = {
+        node: createdNode,
+        edge: createdEdge
+      }
+
+      reply.send(result)
+    } catch (error) {
+      reply.statusCode = 400
+      reply.send(error)
+    }
   })
 }
 

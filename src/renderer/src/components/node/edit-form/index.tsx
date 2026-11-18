@@ -48,7 +48,7 @@ const EditNodeForm = ({ activeNode, onSuccess }: EditNodeFormProps) => {
 
   const createDescendantNodeAndEdge = (data: z.infer<typeof formSchema>) =>
     api
-      .post(`/edges/edgeFromNodes`, undefined, {
+      .post(`/edges/edgeFromNodeTitles`, undefined, {
         ancestorNodeTitle: activeNode.title,
         descendantNodeTitle: data.title,
         project_id: Number(data.project_id)
@@ -63,7 +63,7 @@ const EditNodeForm = ({ activeNode, onSuccess }: EditNodeFormProps) => {
 
   const createAncestorNodeAndEdge = (data: z.infer<typeof formSchema>) =>
     api
-      .post(`/edges/edgeFromNodes`, undefined, {
+      .post(`/edges/edgeFromNodeTitles`, undefined, {
         ancestorNodeTitle: data.title,
         descendantNodeTitle: activeNode.title,
         project_id: Number(data.project_id)

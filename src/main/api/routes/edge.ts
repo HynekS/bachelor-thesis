@@ -6,11 +6,12 @@ import { and, eq } from 'drizzle-orm'
 import { z } from 'zod'
 import { node } from '../../db/schema/node'
 
-export const EdgeIdParamsSchema = z.object({
-  id: z.coerce.number()
+export const EdgeFromToParamsSchema = z.object({
+  from: z.coerce.number(),
+  to: z.coerce.number()
 })
 
-export const EdgeFromNodesParamsSchema = z.object({
+export const edgeFromNodeTitlesParamsSchema = z.object({
   ancestorNodeTitle: z.string(),
   descendantNodeTitle: z.string(),
   project_id: z.number()
@@ -18,8 +19,11 @@ export const EdgeFromNodesParamsSchema = z.object({
 
 const edgeRoutes = (fastify: FastifyInstance): void => {
   fastify.get('/edges', async (request, reply) => {
-    const parsedParams = EdgeIdParamsSchema.parse(request.params)
-    const result = await db.select().from(edge).where(eq(edge.id, parsedParams.id))
+    const parsedParams = EdgeFromToParamsSchema.parse(request.params)
+    const result = await db
+      .select()
+      .from(edge)
+      .where(and(eq(edge.from, parsedParams.from), eq(edge.to, parsedParams.to)))
     reply.send(result)
   })
 
@@ -30,24 +34,24 @@ const edgeRoutes = (fastify: FastifyInstance): void => {
   })
 
   fastify.patch('/edges', async (request, reply) => {
-    const parsedParams = EdgeIdParamsSchema.parse(request.params)
+    const parsedParams = EdgeFromToParamsSchema.parse(request.params)
     const parsedRequestBody = edgeUpdateSchema.parse(request.body)
     const [result] = await db
       .update(edge)
       .set(parsedRequestBody)
-      .where(eq(edge.id, parsedParams.id))
+      .where(and(eq(edge.from, parsedParams.from), eq(edge.to, parsedParams.to)))
       .returning()
     reply.send(result)
   })
 
   fastify.delete('/edges/:id', async (request, reply) => {
-    const parsedParams = EdgeIdParamsSchema.parse(request.params)
-    await db.delete(edge).where(eq(edge.id, parsedParams.id))
+    const parsedParams = EdgeFromToParamsSchema.parse(request.params)
+    await db.delete(edge).where(and(eq(edge.from, parsedParams.from), eq(edge.to, parsedParams.to)))
     reply.code(204)
   })
 
-  fastify.post('/edges/edgeFromNodes', async (request, reply) => {
-    const parsedRequestBody = EdgeFromNodesParamsSchema.parse(request.body)
+  fastify.post('/edges/edgeFromNodeTitles', async (request, reply) => {
+    const parsedRequestBody = edgeFromNodeTitlesParamsSchema.parse(request.body)
 
     const [ancestorNodeFromDb] = await db
       .select()

@@ -1,4 +1,4 @@
-import { AnySQLiteColumn, int, sqliteTable, unique } from 'drizzle-orm/sqlite-core'
+import { AnySQLiteColumn, int, primaryKey, sqliteTable } from 'drizzle-orm/sqlite-core'
 import { createInsertSchema, createUpdateSchema } from 'drizzle-zod'
 import { project } from './project'
 import { node } from './node'
@@ -6,7 +6,6 @@ import { node } from './node'
 export const edge = sqliteTable(
   'edge',
   {
-    id: int().primaryKey({ autoIncrement: true }),
     from: int()
       .notNull()
       .references((): AnySQLiteColumn => node.id, { onDelete: 'cascade' }),
@@ -17,7 +16,14 @@ export const edge = sqliteTable(
       .notNull()
       .references((): AnySQLiteColumn => project.id, { onDelete: 'cascade' })
   },
-  (table) => [unique().on(table.from, table.to, table.project_id)]
+  (table) => {
+    return [
+      primaryKey({
+        name: 'edge_pk',
+        columns: [table.from, table.to]
+      })
+    ]
+  }
 )
 
 export type Edge = typeof edge.$inferSelect
