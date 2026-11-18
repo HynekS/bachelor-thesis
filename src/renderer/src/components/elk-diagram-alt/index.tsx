@@ -16,16 +16,22 @@ import { useCallback, useEffect } from 'react'
 import { v4 as uuid } from 'uuid'
 
 import { handlePositions } from './get-elk-layout'
+import api from '@renderer/services/api-client'
 
 interface ElkdiagramAltProps {
+  projectId: number
   initialNodesAndEdges: {
     initialNodes: ReactFlowNode[]
     initialEdges: ReactFlowEdge[]
   }
-  elkDirection: ElkDirection
+  elkDirection?: ElkDirection
 }
 
-const ElkDiagramAlt = ({ initialNodesAndEdges, elkDirection = 'UP' }: ElkdiagramAltProps) => {
+const ElkDiagramAlt = ({
+  projectId,
+  initialNodesAndEdges,
+  elkDirection = 'UP'
+}: ElkdiagramAltProps) => {
   const { initialNodes, initialEdges } = initialNodesAndEdges
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes)
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges)
@@ -40,7 +46,7 @@ const ElkDiagramAlt = ({ initialNodesAndEdges, elkDirection = 'UP' }: Elkdiagram
   )
 
   const onConnectEnd = useCallback(
-    (event: MouseEvent | TouchEvent, connectionState: FinalConnectionState) => {
+    async (event: MouseEvent | TouchEvent, connectionState: FinalConnectionState) => {
       if (connectionState.isValid || !connectionState.fromNode) return
 
       const { fromNode, fromHandle } = connectionState
@@ -56,6 +62,19 @@ const ElkDiagramAlt = ({ initialNodesAndEdges, elkDirection = 'UP' }: Elkdiagram
       // dragged from a source handle (bottom) -> existing node is the source
       // dragged from a target handle (top)    -> existing node is the target
       const draggedFromSource = fromHandle?.type === 'source'
+
+      await api.post('/nodes/node-from-edge', undefined, {
+        project_id: projectId,
+        edge: {
+          ...(draggedFromSource
+            ? {
+                from: fromNode.id
+              }
+            : {
+                to: fromNode.id
+              })
+        }
+      })
 
       setNodes((nodes) =>
         nodes.concat({
@@ -73,7 +92,7 @@ const ElkDiagramAlt = ({ initialNodesAndEdges, elkDirection = 'UP' }: Elkdiagram
         })
       )
     },
-    [screenToFlowPosition, setNodes, setEdges, elkDirection]
+    [screenToFlowPosition, projectId, setNodes, setEdges, elkDirection]
   )
 
   useEffect(() => {
@@ -86,7 +105,9 @@ const ElkDiagramAlt = ({ initialNodesAndEdges, elkDirection = 'UP' }: Elkdiagram
       }, 10)
     }
     handler()
-  }, [])
+  }, [initialNodesAndEdges, elkDirection])
+
+  console.log(edges)
 
   return (
     <ReactFlow

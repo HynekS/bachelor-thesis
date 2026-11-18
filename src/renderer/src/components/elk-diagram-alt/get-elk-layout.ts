@@ -20,6 +20,7 @@ export default async function getElkLayout(
   direction: ElkDirection = 'RIGHT'
 ) {
   const elk = new ELK()
+  console.log(edges)
 
   const graph: ElkNode = {
     id: 'root',

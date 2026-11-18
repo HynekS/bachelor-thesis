@@ -19,8 +19,8 @@ const nodeFromEdgeBodySchema = z.object({
   project_id: z.coerce.number(),
   edge: z
     .object({
-      from: z.number(),
-      to: z.number()
+      from: z.coerce.number(),
+      to: z.coerce.number()
     })
     .partial()
     .refine(
@@ -84,9 +84,16 @@ const nodeRoutes = (fastify: FastifyInstance): void => {
     try {
       const parsedRequestBody = nodeFromEdgeBodySchema.parse(request.body)
 
+      //const lastUntitledNode = await db
+      //  .select()
+      //  .from(node)
+      //  .where(
+      //    and(eq(node.project_id, parsedRequestBody.project_id), like(node.title, 'Untitled%'))
+      //  )
+
       const [createdNode] = await db
         .insert(node)
-        .values({ project_id: parsedRequestBody.project_id, title: 'Untitled' })
+        .values({ project_id: parsedRequestBody.project_id })
         .returning()
 
       if (!createdNode) throw new Error('Unable to create new node')
@@ -96,9 +103,9 @@ const nodeRoutes = (fastify: FastifyInstance): void => {
       const [createdEdge] = await db
         .insert(edge)
         .values({
-          project_id: parsedRequestBody.project_id,
           from: isCreatedNodeTarget ? parsedRequestBody.edge.from : createdNode.id,
-          to: isCreatedNodeTarget ? createdNode.id : parsedRequestBody.edge.to
+          to: isCreatedNodeTarget ? createdNode.id : parsedRequestBody.edge.to,
+          project_id: parsedRequestBody.project_id
         })
         .returning()
 

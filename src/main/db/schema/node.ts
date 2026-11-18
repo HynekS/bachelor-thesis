@@ -6,7 +6,7 @@ export const node = sqliteTable(
   'node',
   {
     id: int().primaryKey({ autoIncrement: true }),
-    title: text().notNull(),
+    title: text(),
     project_id: int()
       .notNull()
       .references((): AnySQLiteColumn => project.id, { onDelete: 'cascade' })

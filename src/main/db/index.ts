@@ -7,7 +7,9 @@ import { migrate } from 'drizzle-orm/libsql/migrator'
 import { createClient } from '@libsql/client'
 
 const client = createClient({
-  url: `file:${path.join(app.getPath('userData'), 'database.sqlite')}`
+  url: app.isPackaged
+    ? `file:${path.join(app.getPath('userData'), 'database.sqlite')}`
+    : `file:${path.join(__dirname, '../../src/main/db/local.db')}`
 })
 const db = drizzle({ client })
 

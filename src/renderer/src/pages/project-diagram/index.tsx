@@ -36,7 +36,7 @@ const ProjectDiagram = () => {
   return (
     <ElkDiagramProvider>
       {initialNodesAndEdges ? (
-        <ElkDiagramAlt initialNodesAndEdges={initialNodesAndEdges} />
+        <ElkDiagramAlt projectId={Number(projectId)} initialNodesAndEdges={initialNodesAndEdges} />
       ) : (
         'Loading…'
       )}

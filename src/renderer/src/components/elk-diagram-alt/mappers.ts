@@ -2,7 +2,7 @@ import { Edge } from '@db/schema/edge'
 import { Node } from '@db/schema/node'
 
 const mapEdge = (edge: Edge) => ({
-  id: `${edge.id}`,
+  id: `${edge.from}-${edge.to}`,
   source: `${edge.from}`,
   target: `${edge.to}`,
   type: 'smoothstep'
