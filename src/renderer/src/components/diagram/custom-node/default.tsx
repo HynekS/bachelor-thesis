@@ -5,6 +5,7 @@ import cx from 'classnames'
 import styles from './styles.module.css'
 import { Button } from '@renderer/components/ui/button'
 import api from '@renderer/services/api-client'
+import { Node } from '@db/schema/node'
 
 const DefaultNode = (props: NodeProps) => {
   const { setNodes } = useReactFlow()
@@ -22,6 +23,8 @@ const DefaultNode = (props: NodeProps) => {
     return () => document.removeEventListener('pane-click', closeOpenInput)
   }, [])
 
+  console.log(props.data.label)
+
   return (
     <div className="text-updater-node">
       <div className={cx('relative', styles.contentWrapper)} data-content={props.data.label}>
@@ -33,7 +36,7 @@ const DefaultNode = (props: NodeProps) => {
                 id="text"
                 name="text"
                 defaultValue={props.data.label}
-                className="absolute inset-0"
+                className="absolute inset-0 text-center"
                 autoFocus
                 onFocus={(event) => {
                   // Select the current input content
@@ -47,10 +50,19 @@ const DefaultNode = (props: NodeProps) => {
                   if (!inputValue) return
 
                   api
-                    .patch(`/nodes/${props.id}`, undefined, {
+                    .patch<Node>(`/nodes/${props.id}`, undefined, {
                       title: inputValue
                     })
-                    .then(() => setIsEditMode(false))
+                    .then((res) => {
+                      setNodes((prevNodes) =>
+                        prevNodes.map((node) => {
+                          return node.id === props.id
+                            ? { ...node, id: `${res.id}`, data: { ...node.data, label: res.title } }
+                            : node
+                        })
+                      )
+                      setIsEditMode(false)
+                    })
                 }}
               >
                 update
