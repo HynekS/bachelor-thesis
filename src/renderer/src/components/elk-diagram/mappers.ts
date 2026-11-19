@@ -11,7 +11,7 @@ const mapEdge = (edge: Edge) => ({
 const mapNode = (node: Node) => ({
   id: `${node.id}`,
   data: {
-    label: node.title
+    label: node.title ?? 'Untitled'
   },
   position: {
     x: 0,

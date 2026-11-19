@@ -17,6 +17,7 @@ import { v4 as uuid } from 'uuid'
 
 import { handlePositions } from './get-elk-layout'
 import api from '@renderer/services/api-client'
+import { nodeTypes } from './constants'
 
 interface ElkdiagramAltProps {
   projectId: number
@@ -107,7 +108,10 @@ const ElkDiagramAlt = ({
     handler()
   }, [initialNodesAndEdges, elkDirection])
 
-  console.log(edges)
+  const onPaneClick = () => {
+    const e = new CustomEvent('pane-click')
+    document.dispatchEvent(e)
+  }
 
   return (
     <ReactFlow
@@ -119,6 +123,8 @@ const ElkDiagramAlt = ({
       onEdgesChange={onEdgesChange}
       onConnect={onConnect}
       onConnectEnd={onConnectEnd}
+      onPaneClick={onPaneClick}
+      nodeTypes={nodeTypes}
       snapToGrid
       fitView
     >

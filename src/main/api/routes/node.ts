@@ -48,9 +48,10 @@ const nodeRoutes = (fastify: FastifyInstance): void => {
     }
   })
 
-  fastify.patch('/nodes', async (request, reply) => {
+  fastify.patch('/nodes/:id', async (request, reply) => {
     const parsedParams = NodeIdParamsSchema.parse(request.params)
     const parsedRequestBody = nodeUpdateSchema.parse(request.body)
+
     const [result] = await db
       .update(node)
       .set(parsedRequestBody)
@@ -83,13 +84,6 @@ const nodeRoutes = (fastify: FastifyInstance): void => {
   fastify.post('/nodes/node-from-edge', async (request, reply) => {
     try {
       const parsedRequestBody = nodeFromEdgeBodySchema.parse(request.body)
-
-      //const lastUntitledNode = await db
-      //  .select()
-      //  .from(node)
-      //  .where(
-      //    and(eq(node.project_id, parsedRequestBody.project_id), like(node.title, 'Untitled%'))
-      //  )
 
       const [createdNode] = await db
         .insert(node)

@@ -1,13 +1,11 @@
 import ElkDiagramProvider from '@renderer/components/diagram-provider'
-import ElkDiagramAlt from '@renderer/components/elk-diagram-alt'
-
+import ElkDiagram from '@renderer/components/elk-diagram'
 import { useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
 import api from '@renderer/services/api-client'
 import { Node } from '@db/schema/node'
-// import Diagram from '@renderer/components/diagram'
 import { Edge } from '@db/schema/edge'
-import { mapEdge, mapNode } from '@renderer/components/elk-diagram-alt/mappers'
+import { mapEdge, mapNode } from '@renderer/components/elk-diagram/mappers'
 import { useParams } from '@tanstack/react-router'
 
 const ProjectDiagram = () => {
@@ -36,7 +34,7 @@ const ProjectDiagram = () => {
   return (
     <ElkDiagramProvider>
       {initialNodesAndEdges ? (
-        <ElkDiagramAlt projectId={Number(projectId)} initialNodesAndEdges={initialNodesAndEdges} />
+        <ElkDiagram projectId={Number(projectId)} initialNodesAndEdges={initialNodesAndEdges} />
       ) : (
         'Loading…'
       )}

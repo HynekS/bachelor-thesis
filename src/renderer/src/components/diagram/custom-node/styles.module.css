@@ -1,0 +1,4 @@
+.contentWrapper::before {
+  visibility: hidden;
+  content: attr(data-content)
+}
