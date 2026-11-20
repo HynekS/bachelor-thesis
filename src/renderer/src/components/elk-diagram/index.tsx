@@ -18,8 +18,10 @@ import { v4 as uuid } from 'uuid'
 import { handlePositions } from './get-elk-layout'
 import api from '@renderer/services/api-client'
 import { nodeTypes } from './constants'
+import { Node } from '@db/schema/node'
+import { Edge } from '@db/schema/edge'
 
-interface ElkdiagramAltProps {
+interface ElkdiagramProps {
   projectId: number
   initialNodesAndEdges: {
     initialNodes: ReactFlowNode[]
@@ -28,11 +30,7 @@ interface ElkdiagramAltProps {
   elkDirection?: ElkDirection
 }
 
-const ElkDiagramAlt = ({
-  projectId,
-  initialNodesAndEdges,
-  elkDirection = 'UP'
-}: ElkdiagramAltProps) => {
+const ElkDiagram = ({ projectId, initialNodesAndEdges, elkDirection = 'UP' }: ElkdiagramProps) => {
   const { initialNodes, initialEdges } = initialNodesAndEdges
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes)
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges)
@@ -64,32 +62,42 @@ const ElkDiagramAlt = ({
       // dragged from a target handle (top)    -> existing node is the target
       const draggedFromSource = fromHandle?.type === 'source'
 
-      await api.post('/nodes/node-from-edge', undefined, {
-        project_id: projectId,
-        edge: {
-          ...(draggedFromSource
-            ? {
-                from: fromNode.id
-              }
-            : {
-                to: fromNode.id
-              })
+      const connectionResult = await api.post<{ node: Node; edge: Edge }>(
+        '/nodes/node-from-edge',
+        undefined,
+        {
+          project_id: projectId,
+          edge: {
+            ...(draggedFromSource
+              ? {
+                  from: fromNode.id
+                }
+              : {
+                  to: fromNode.id
+                })
+          }
         }
-      })
+      )
+
+      const { node: nodeSavedInDb, edge: edgeSavedInDb } = connectionResult
 
       setNodes((nodes) =>
         nodes.concat({
           ...newNode,
+          id: `${nodeSavedInDb.id}`,
+          data: {
+            label: nodeSavedInDb.title ?? 'Untitled'
+          },
           ...handlePositions[elkDirection],
           origin: [0.5, draggedFromSource ? 1.0 : 0.0] as [number, number]
         })
       )
       setEdges((edges) =>
         edges.concat({
-          id: uuid(),
+          id: `${edgeSavedInDb.from}-${edgeSavedInDb.to}`,
           type: 'smoothstep',
-          source: draggedFromSource ? fromNode.id : newNodeId,
-          target: draggedFromSource ? newNodeId : fromNode.id
+          source: draggedFromSource ? fromNode.id : `${nodeSavedInDb.id}`,
+          target: draggedFromSource ? `${nodeSavedInDb.id}` : fromNode.id
         })
       )
     },
@@ -113,6 +121,8 @@ const ElkDiagramAlt = ({
     document.dispatchEvent(e)
   }
 
+  console.log(edges)
+
   return (
     <ReactFlow
       defaultNodes={nodes}
@@ -134,4 +144,4 @@ const ElkDiagramAlt = ({
   )
 }
 
-export default ElkDiagramAlt
+export default ElkDiagram
