@@ -23,8 +23,6 @@ const DefaultNode = (props: NodeProps) => {
     return () => document.removeEventListener('pane-click', closeOpenInput)
   }, [])
 
-  console.log(props.data.label)
-
   return (
     <div className="text-updater-node">
       <div className={cx('relative', styles.contentWrapper)} data-content={props.data.label}>
@@ -70,15 +68,17 @@ const DefaultNode = (props: NodeProps) => {
             </div>
           </div>
         ) : (
-          <label
-            htmlFor="text"
-            className="absolute inset-0"
-            onClick={() => {
-              setIsEditMode(true)
-            }}
-          >
-            {props.data.label}
-          </label>
+          <div className="absolute inset-0">
+            <label
+              htmlFor="text"
+              className="text-center inline-block"
+              onClick={() => {
+                setIsEditMode(true)
+              }}
+            >
+              {props.data.label}
+            </label>
+          </div>
         )}
       </div>
       <Handle type="source" position={Position.Top} />

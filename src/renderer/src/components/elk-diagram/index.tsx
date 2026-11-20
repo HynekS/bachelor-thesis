@@ -9,10 +9,11 @@ import {
   type Node as ReactFlowNode,
   type Edge as ReactFlowEdge,
   type FinalConnectionState,
-  type Connection
+  type Connection,
+  useOnSelectionChange
 } from '@xyflow/react'
 import getElkLayout, { ElkDirection } from './get-elk-layout'
-import { useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { v4 as uuid } from 'uuid'
 
 import { handlePositions } from './get-elk-layout'
@@ -35,6 +36,20 @@ const ElkDiagram = ({ projectId, initialNodesAndEdges, elkDirection = 'UP' }: El
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes)
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges)
   const { getNodes, getEdges, fitView, screenToFlowPosition } = useReactFlow()
+
+  const [selectedNodes, setSelectedNodes] = useState([])
+  const [selectedEdges, setSelectedEdges] = useState([])
+
+  console.log(selectedNodes, selectedEdges)
+
+  const onChange = useCallback(({ nodes, edges }) => {
+    setSelectedNodes(nodes.map((node) => node.id))
+    setSelectedEdges(edges.map((edge) => edge.id))
+  }, [])
+
+  useOnSelectionChange({
+    onChange
+  })
 
   const onConnect = useCallback(
     (params: Connection) => {
@@ -120,8 +135,6 @@ const ElkDiagram = ({ projectId, initialNodesAndEdges, elkDirection = 'UP' }: El
     const e = new CustomEvent('pane-click')
     document.dispatchEvent(e)
   }
-
-  console.log(edges)
 
   return (
     <ReactFlow

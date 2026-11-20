@@ -4,20 +4,21 @@ import ProjectList from '@renderer/pages/project-list'
 import { createMemoryHistory } from '@tanstack/react-router'
 
 import { Outlet, createRouter, createRoute, createRootRoute } from '@tanstack/react-router'
-import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
+// import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 import TopNavigation from '@renderer/components/top-navigation'
 import ProjectDiagram from '@renderer/pages/project-diagram'
 import ProjectInfo from '@renderer/pages/project-info'
 import Navigation from '@renderer/components/project/navigation'
 import ProjectAddNodeForm from '@renderer/pages/project-add-node-form'
+import RootLayout from '@renderer/components/layouts/root-layout'
 
 const rootRoute = createRootRoute({
   component: () => (
-    <>
+    <RootLayout>
       <TopNavigation />
       <Outlet />
-      <TanStackRouterDevtools />
-    </>
+      {/* <TanStackRouterDevtools /> */}
+    </RootLayout>
   )
 })
 
