@@ -44,7 +44,7 @@ const edgeRoutes = (fastify: FastifyInstance): void => {
     reply.send(result)
   })
 
-  fastify.delete('/edges/:id', async (request, reply) => {
+  fastify.delete('/edges/:from/:to', async (request, reply) => {
     const parsedParams = EdgeFromToParamsSchema.parse(request.params)
     await db.delete(edge).where(and(eq(edge.from, parsedParams.from), eq(edge.to, parsedParams.to)))
     reply.code(204)

@@ -9,11 +9,12 @@ import {
   type Node as ReactFlowNode,
   type Edge as ReactFlowEdge,
   type FinalConnectionState,
-  type Connection,
-  useOnSelectionChange
+  type Connection
+  //useOnSelectionChange,
+  //OnSelectionChangeFunc
 } from '@xyflow/react'
 import getElkLayout, { ElkDirection } from './get-elk-layout'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect } from 'react'
 import { v4 as uuid } from 'uuid'
 
 import { handlePositions } from './get-elk-layout'
@@ -37,19 +38,30 @@ const ElkDiagram = ({ projectId, initialNodesAndEdges, elkDirection = 'UP' }: El
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges)
   const { getNodes, getEdges, fitView, screenToFlowPosition } = useReactFlow()
 
-  const [selectedNodes, setSelectedNodes] = useState([])
-  const [selectedEdges, setSelectedEdges] = useState([])
+  //const [selectedNodes, setSelectedNodes] = useState<ReactFlowNode[]>([])
+  //const [selectedEdges, setSelectedEdges] = useState<ReactFlowEdge[]>([])
+  //
+  //const onSelectionChange = useCallback<OnSelectionChangeFunc<ReactFlowNode, ReactFlowEdge>>(
+  //  ({ nodes, edges }) => {
+  //    setSelectedNodes(nodes)
+  //    setSelectedEdges(edges)
+  //  },
+  //  []
+  //)
+  //
+  //useOnSelectionChange({
+  //  onChange: onSelectionChange
+  //})
 
-  console.log(selectedNodes, selectedEdges)
+  const onDelete = ({ nodes, edges }: { nodes: ReactFlowNode[]; edges: ReactFlowEdge[] }) => {
+    for (const edge of edges) {
+      api.delete(`/edges/${edge.source}/${edge.target}`)
+    }
 
-  const onChange = useCallback(({ nodes, edges }) => {
-    setSelectedNodes(nodes.map((node) => node.id))
-    setSelectedEdges(edges.map((edge) => edge.id))
-  }, [])
-
-  useOnSelectionChange({
-    onChange
-  })
+    for (const node of nodes) {
+      api.delete(`/nodes/${node.id}`)
+    }
+  }
 
   const onConnect = useCallback(
     (params: Connection) => {
@@ -147,6 +159,7 @@ const ElkDiagram = ({ projectId, initialNodesAndEdges, elkDirection = 'UP' }: El
       onConnect={onConnect}
       onConnectEnd={onConnectEnd}
       onPaneClick={onPaneClick}
+      onDelete={onDelete}
       nodeTypes={nodeTypes}
       snapToGrid
       fitView
